@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 const Navbar = () => {
   const Nav = useNavigate()
     return (
-        <Stack width={"100%"} padding={"10px"} bgcolor={"#6DCAF5"} direction="row" justifyContent={'space-between'} >
+        <Stack padding={"10px"} bgcolor={"#3390FF"} direction="row" justifyContent={'space-between'} >
           <Stack width={"50px"} >
           <img src={Img} style={{
             borderRadius: "100px"
