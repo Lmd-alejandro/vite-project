@@ -1,14 +1,24 @@
-import { Button, Stack, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  FormControlLabel,
+  Stack,
+  TextField,
+  Typography,
+  Checkbox,
+} from "@mui/material";
 import Navbar from "../components/Navbar";
 import { useState } from "react";
+import axios from "axios";
 
 const initValues = {
-  FirstName: "",
-  LastName: "",
-  Email: "",
+  User: "",
+  email: "",
   CreatePassword: "",
   ConfirmPassword: "",
+  isAdmin: true
 };
+
+const baseUrl ="https://api.jedidiazfagundez.site/api"
 
 function Register() {
   const [form, setForm] = useState(initValues);
@@ -24,18 +34,44 @@ function Register() {
 
   const handleSubmit = () => {
     console.log(form);
-    if (form.Email === "") {
+    const emailRegEx = /^[^@]+@[^@]+.[a-zA-Z]{2,}$/;
+    if (form.email === "" || !emailRegEx.test(form.email)) {
       setFormError((props) => ({
         ...props,
-        Email: "required",
+        Email: "Email Required or the email is invalid",
       }));
+      return ;
     } else {
       setFormError((props) => ({
         ...props,
         Email: "",
       }));
     }
+
+    if (
+      form.CreatePassword === "" ||
+      form.ConfirmPassword === "" ||
+      form.ConfirmPassword !== form.CreatePassword
+    ) {
+      setFormError((props) => ({
+        ...props,
+        CreatePassword: "Required and the password must be equal",
+      }));
+      return  ;
+    } else {
+      console.log("hola")
+      setFormError((props) => ({
+        ...props,
+        CreatePassword: "",
+      }));
+    }
+
+    axios.post(`${baseUrl}/user/register`, form)
+    .then((response) => console.log(response))
+    .catch((err) => console.log(err))
+
   };
+
 
   return (
     <>
@@ -43,44 +79,32 @@ function Register() {
 
       <Stack justifyContent="center" alignItems="center">
         <Stack width="100%" maxWidth="600px" spacing={5}>
-          <Typography variant="h4" textAlign="center" paddingTop={10}>
+          <Typography variant="h4" textAlign="center" paddingTop={3}>
             Sign Up
           </Typography>
 
           <Stack spacing={3} bgcolor={"#ffffff"} direction="row">
+            
             <TextField
               required
-              id="filled-basic-required"
-              label="First Name"
+              label="User"
               variant="filled"
               type="text"
               onChange={handleChange}
-              name="First Name"
-              fullWidth
-            />
-
-            <TextField
-              required
-              id="filled-basic-required"
-              label="Last Name"
-              variant="filled"
-              type="text"
-              onChange={handleChange}
-              name="Last Name"
+              name="User"
               fullWidth
             />
           </Stack>
 
           <Stack marginTop={10} spacing={3}>
             <TextField
-              error={Boolean(formError.Email)}
-              helperText={formError.Email}
+              error={Boolean(formError.email)}
+              helperText={formError.email}
               type="Email"
               onChange={handleChange}
               name="Email"
               fullWidth
               required
-              id="filled-basic-required"
               label="Email"
               variant="filled"
             />
@@ -89,29 +113,42 @@ function Register() {
           <Stack marginTop={10} spacing={3} direction={"row"}>
             <TextField
               required
-              id="filled-password-input/required"
+              error={Boolean(formError.CreatePassword)}
+              helperText={formError.CreatePassword}
               label="Create Password"
               type="Password"
               autoComplete="current-password"
               variant="filled"
               onChange={handleChange}
-              name="Create Password"
+              name="CreatePassword"
               fullWidth
             />
 
             <TextField
               required
-              id="fillet-password-input-required"
+              error={Boolean(formError.ConfirmPassword)}
+              helperText={formError.ConfirmPassword}
               label="Confirm Password"
               type="Password"
               autoComplete="current-password"
               variant="filled"
               onChange={handleChange}
-              name="Confirm Password"
+              name="ConfirmPassword"
               fullWidth
             />
           </Stack>
-          <Button onClick={handleSubmit} size="large" variant="contained" fullWidth>
+
+          <FormControlLabel name="isAdmin" onChange={handleChange}
+            control={<Checkbox defaultChecked />}
+            label="Admin"
+          />
+
+          <Button
+            onClick={handleSubmit}
+            size="large"
+            variant="contained"
+            fullWidth
+          >
             Sign Up
           </Button>
         </Stack>
