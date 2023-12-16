@@ -11,10 +11,10 @@ import { useState } from "react";
 import axios from "axios";
 
 const initValues = {
-  User: "",
   email: "",
   CreatePassword: "",
   ConfirmPassword: "",
+  username: "",
   isAdmin: true
 };
 
@@ -38,13 +38,12 @@ function Register() {
     if (form.email === "" || !emailRegEx.test(form.email)) {
       setFormError((props) => ({
         ...props,
-        Email: "Email Required or the email is invalid",
+        email: "Email Required or the email is invalid",
       }));
-      return ;
     } else {
       setFormError((props) => ({
         ...props,
-        Email: "",
+        email: "",
       }));
     }
 
@@ -57,21 +56,34 @@ function Register() {
         ...props,
         CreatePassword: "Required and the password must be equal",
       }));
-      return  ;
     } else {
-      console.log("hola")
       setFormError((props) => ({
         ...props,
         CreatePassword: "",
       }));
     }
 
-    axios.post(`${baseUrl}/user/register`, form)
+    if (form.username.length <= 3){
+       setFormError((props) => ({
+        ...props,
+        username: "Required User",
+      }));
+    } else {
+      setFormError((props) => ({
+        ...props,
+        username: "",
+      }));
+    }
+if(formError.username === "" || formError.email === "" || formError.CreatePassword === "") 
+    axios.post(`${baseUrl}/user/register`, {
+      username: form.username,
+      password: form.CreatePassword,
+      email: form.email,
+      role: form.isAdmin ? "admin" : "user"
+    })
     .then((response) => console.log(response))
     .catch((err) => console.log(err))
-
   };
-
 
   return (
     <>
@@ -86,12 +98,14 @@ function Register() {
           <Stack spacing={3} bgcolor={"#ffffff"} direction="row">
             
             <TextField
+              error={Boolean(formError.username)}
+              helperText={formError.username}
               required
               label="User"
               variant="filled"
               type="text"
               onChange={handleChange}
-              name="User"
+              name="username"
               fullWidth
             />
           </Stack>
@@ -100,13 +114,13 @@ function Register() {
             <TextField
               error={Boolean(formError.email)}
               helperText={formError.email}
-              type="Email"
-              onChange={handleChange}
-              name="Email"
-              fullWidth
               required
               label="Email"
               variant="filled"
+              type="Email"
+              onChange={handleChange}
+              name="email"
+              fullWidth
             />
           </Stack>
 
@@ -139,7 +153,7 @@ function Register() {
           </Stack>
 
           <FormControlLabel name="isAdmin" onChange={handleChange}
-            control={<Checkbox defaultChecked />}
+            control={<Checkbox  />}
             label="Admin"
           />
 
